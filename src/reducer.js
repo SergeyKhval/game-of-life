@@ -1,12 +1,17 @@
 import range from 'lodash/range';
+import { INITIALIZE, STEP } from './actions';
 
-const initialState = {
-  width: 50,
-  height: 50,
-  cells: [],
-  running: true,
-  steps: 0,
-};
+function initialize(width = 50, height = 50) {
+  return {
+    width,
+    height,
+    cells: (range(width * height)).map(() => Math.round(Math.random() * 0.75)),
+    running: true,
+    steps: 0,
+  };
+}
+
+const initialState = initialize();
 
 function getCellRow(index, width) {
   return Math.floor(index / width);
@@ -70,13 +75,13 @@ function processCell(width, height) {
   };
 }
 
-export function gameReducer(game = initialState, action) {
+export default function gameReducer(game = initialState, action) {
   const cellProcessor = processCell(game.width, game.height);
 
   switch (action.type) {
-    case 'INITIALIZE':
-      return { ...game, cells: (range(game.width * game.height)).map(() => Math.round(Math.random())) };
-    case 'STEP':
+    case INITIALIZE:
+      return { ...game, cells: initialize(game.width, game.height) };
+    case STEP:
       return {
         ...game,
         cells: game.cells.map(cellProcessor),
@@ -90,3 +95,7 @@ export function gameReducer(game = initialState, action) {
       return game;
   }
 }
+
+export const getWidth = (state) => state.width;
+export const getHeight = (state) => state.height;
+export const getCells = (state) => state.cells;
